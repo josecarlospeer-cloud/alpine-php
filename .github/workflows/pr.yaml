@@ -10,31 +10,27 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ "8.0", "8.1", "8.2", "8.3" ]
+        version: [ "8.1", "8.2", "8.3" ]
 
     name: ${{ matrix.version }}
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ matrix.version }}
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@master
+      uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@master
-    - uses: azure/docker-login@v1
+      uses: docker/setup-buildx-action@v3
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - name: Build
       run: |
-         docker buildx create --name alpine-php
-         docker buildx use alpine-php
-         docker buildx inspect --bootstrap
-         ARCHS="linux/arm64" make build
-    - name: Run
-      run: |
-        make run-detached
+        ARCHS="linux/amd64" make build
     - name: Test Main
-      run: |
-        make test-main
+      run: make test-main
+    - name: Test Dev
+      run: make test-dev
