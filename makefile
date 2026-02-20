@@ -35,13 +35,13 @@ release: build
 	docker buildx build --platform $(ARCHS) --push -t $(REPO):${SEMVER} --target main -f ${VERSION}/Dockerfile ${VERSION}/
 	docker buildx build --platform $(ARCHS) --push -t $(REPO):${SEMVER}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
 
-test-all: test-all
-	VERSION=8.2 make build
-	VERSION=8.1 make build
-	VERSION=8.0 make build
-	VERSION=8.2 make test-main
-	VERSION=8.1 make test-main
-	VERSION=8.0 make test-main
-	VERSION=8.2 make test-dev
-	VERSION=8.1 make test-dev
-	VERSION=8.0 make test-dev
+test-all:
+	VERSION=8.3 $(MAKE) build
+	VERSION=8.2 $(MAKE) build
+	VERSION=8.1 $(MAKE) build
+	VERSION=8.3 $(MAKE) test-main
+	VERSION=8.2 $(MAKE) test-main
+	VERSION=8.1 $(MAKE) test-main
+	VERSION=8.3 $(MAKE) test-dev
+	VERSION=8.2 $(MAKE) test-dev
+	VERSION=8.1 $(MAKE) test-dev
