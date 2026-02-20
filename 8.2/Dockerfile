@@ -1,10 +1,10 @@
-FROM --platform=$BUILDPLATFORM alpine:edge as main
+FROM --platform=$BUILDPLATFORM alpine:3.21 as main
 
 LABEL maintainer="Jorge Arco <jorge.arcoma@gmail.com>"
 
-RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main add \
+RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/main add \
     icu-libs \
-    && apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/community add \
+    && apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/community add \
     # Current packages don't exist in other repositories
     libavif \
     gnu-libiconv \
@@ -56,7 +56,7 @@ ARG PASSWORD=root
 
 ARG COMPOSER_VERSION=2.5.1
 
-RUN apk add -U --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/   \
+RUN apk add -U --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/community/ \
         php82-pear \
         openssh \
         supervisor \
