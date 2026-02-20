@@ -23,13 +23,14 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Login to Docker Hub
+      # Optional: avoids pull rate limits. Not available on fork PRs — that's fine.
       uses: docker/login-action@v3
+      continue-on-error: true
       with:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - name: Build
-      run: |
-        ARCHS="linux/amd64" make build
+      run: ARCHS="linux/amd64" make build
     - name: Test Main
       run: make test-main
     - name: Test Dev
