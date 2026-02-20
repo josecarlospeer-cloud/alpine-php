@@ -1,14 +1,12 @@
-FROM --platform=$BUILDPLATFORM alpine:edge as main
+FROM --platform=$BUILDPLATFORM alpine:3.20 as main
 
 LABEL maintainer="Jorge Arco <jorge.arcoma@gmail.com>"
 
-RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main add \
+RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.20/main add \
     icu-libs \
-    && apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/community add \
-    # Current packages don't exist in other repositories
+    && apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.20/community add \
     libavif \
     gnu-libiconv \
-    # Packages
     tini \
     php83 \
     php83-dev \
@@ -35,13 +33,15 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main 
     php83-fpm \
     php83-sodium \
     php83-tokenizer \
-    # Iconv Fix
     php83-pecl-apcu \
     && ln -sf /usr/bin/php83 /usr/bin/php
 
 ADD rootfs /
 
 ENTRYPOINT ["/sbin/tini", "--"]
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+    CMD /usr/sbin/php-fpm83 -t 2>&1 | grep -q "test is successful" || exit 1
 
 CMD ["/usr/sbin/php-fpm83", "-R", "--nodaemonize"]
 
@@ -54,10 +54,11 @@ FROM --platform=$BUILDPLATFORM main as dev
 ARG USER=root
 ARG PASSWORD=root
 
-ARG COMPOSER_VERSION=2.5.1
+ARG COMPOSER_VERSION=2.9.5
 
-RUN apk add -U --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/   \
+RUN apk add -U --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.20/community/ \
         php83-pear \
+        php83-xdebug \
         openssh \
         supervisor \
         autoconf \
@@ -66,14 +67,10 @@ RUN apk add -U --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge
         wget \
         make \
         zip \
-        php83-xdebug \
-    # Delete APK cache.
     && rm -rf /var/cache/apk/* \
-    # Create ssh user for dev.
     && sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config \
     && echo "${USER}:${PASSWORD}" | chpasswd \
     && ssh-keygen -A \
-    # Download composer.
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION}
 
 ADD devfs /

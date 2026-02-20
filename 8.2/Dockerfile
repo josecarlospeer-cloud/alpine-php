@@ -43,6 +43,9 @@ ADD rootfs /
 
 ENTRYPOINT ["/sbin/tini", "--"]
 
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+    CMD /usr/sbin/php-fpm82 -t 2>&1 | grep -q "test is successful" || exit 1
+
 CMD ["/usr/sbin/php-fpm82", "-R", "--nodaemonize"]
 
 EXPOSE 9000
@@ -54,7 +57,7 @@ FROM --platform=$BUILDPLATFORM main as dev
 ARG USER=root
 ARG PASSWORD=root
 
-ARG COMPOSER_VERSION=2.5.1
+ARG COMPOSER_VERSION=2.9.5
 
 RUN apk add -U --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/community/ \
         php82-pear \

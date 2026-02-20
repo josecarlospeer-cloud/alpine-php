@@ -1,15 +1,12 @@
-FROM --platform=$BUILDPLATFORM alpine:3.17 as main
+FROM --platform=$BUILDPLATFORM alpine:3.19 as main
 
 LABEL maintainer="Jorge Arco <jorge.arcoma@gmail.com>"
 
-RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main add \
+RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.19/main add \
     icu-libs \
-    libsodium \
-    &&apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/community add \
-    # Current packages don't exist in other repositories
+    && apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.19/community add \
     libavif \
-    && apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted gnu-libiconv \
-    # Packages
+    gnu-libiconv \
     tini \
     php81 \
     php81-dev \
@@ -36,13 +33,15 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main 
     php81-fpm \
     php81-sodium \
     php81-tokenizer \
-    # Iconv Fix
     php81-pecl-apcu \
     && ln -sf /usr/bin/php81 /usr/bin/php
 
 ADD rootfs /
 
 ENTRYPOINT ["/sbin/tini", "--"]
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+    CMD /usr/sbin/php-fpm81 -t 2>&1 | grep -q "test is successful" || exit 1
 
 CMD ["/usr/sbin/php-fpm81", "-R", "--nodaemonize"]
 
@@ -55,10 +54,11 @@ FROM --platform=$BUILDPLATFORM main as dev
 ARG USER=root
 ARG PASSWORD=root
 
-ARG COMPOSER_VERSION=2.5.1
+ARG COMPOSER_VERSION=2.9.5
 
-RUN apk add -U --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/   \
+RUN apk add -U --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.19/community/ \
         php81-pear \
+        php81-xdebug \
         openssh \
         supervisor \
         autoconf \
@@ -67,14 +67,10 @@ RUN apk add -U --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge
         wget \
         make \
         zip \
-        php81-xdebug \
-    # Delete APK cache.
     && rm -rf /var/cache/apk/* \
-    # Create ssh user for dev.
     && sed -i s/#PermitRootLogin.*/PermitRootLogin\ yes/ /etc/ssh/sshd_config \
     && echo "${USER}:${PASSWORD}" | chpasswd \
     && ssh-keygen -A \
-    # Download composer.
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION}
 
 ADD devfs /
