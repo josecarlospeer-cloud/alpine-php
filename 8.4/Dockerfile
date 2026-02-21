@@ -1,6 +1,6 @@
 # PHP 8.4 — uses alpine:edge until php84 lands in a stable Alpine release.
 # TODO: pin to alpine:3.22 (or next stable) once available.
-FROM --platform=$BUILDPLATFORM alpine:edge as main
+FROM --platform=$BUILDPLATFORM alpine:edge AS main
 
 LABEL maintainer="Jorge Arco <jorge.arcoma@gmail.com>"
 
@@ -51,7 +51,7 @@ EXPOSE 9000
 
 WORKDIR /app
 
-FROM --platform=$BUILDPLATFORM main as dev
+FROM --platform=$BUILDPLATFORM main AS dev
 
 ARG USER=root
 ARG PASSWORD=root
