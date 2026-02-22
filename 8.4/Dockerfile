@@ -19,6 +19,7 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main 
     php84-ctype \
     php84-curl \
     php84-exif \
+    php84-fileinfo \
     php84-iconv \
     php84-intl \
     php84-mbstring \
@@ -35,6 +36,10 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/edge/main 
     php84-fpm \
     php84-sodium \
     php84-tokenizer \
+    php84-pdo \
+    php84-pdo_mysql \
+    php84-pdo_pgsql \
+    php84-simplexml \
     php84-pecl-apcu \
     && ln -sf /usr/bin/php84 /usr/bin/php
 
