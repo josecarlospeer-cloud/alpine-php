@@ -2,10 +2,13 @@ REPO:=jorge07/alpine-php
 DOCKER_RUN:=docker run --rm -v $(PWD):/app ${REPO}:${VERSION}
 DOCKER_RUN_DEV:=$(DOCKER_RUN)-dev
 ARCHS?=linux/amd64
+BUILD_DATE?=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
+VCS_REF?=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+OCI_LABELS=--build-arg BUILD_DATE=$(BUILD_DATE) --build-arg VCS_REF=$(VCS_REF)
 
 build:
-	docker buildx build --load --platform linux/amd64 -t $(REPO):${VERSION} --target main -f ${VERSION}/Dockerfile ${VERSION}/
-	docker buildx build --load --platform linux/amd64 -t $(REPO):${VERSION}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --load --platform linux/amd64 $(OCI_LABELS) -t $(REPO):${VERSION} --target main -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --load --platform linux/amd64 $(OCI_LABELS) -t $(REPO):${VERSION}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
 
 run-detached:
 	docker run --name php${VERSION} -d -v $(PWD):/app $(REPO):${VERSION}
@@ -30,10 +33,10 @@ release: build
 	echo "Releasing: ${REPO}:${VERSION}"
 	echo "Releasing: ${REPO}:${VERSION}-dev"
 	$(eval export SEMVER=$(shell docker run --rm -v $(PWD):/app ${REPO}:${VERSION} php -r "echo phpversion();"))
-	docker buildx build --platform $(ARCHS) --push -t $(REPO):${VERSION} --target main -f ${VERSION}/Dockerfile ${VERSION}/
-	docker buildx build --platform $(ARCHS) --push -t $(REPO):${VERSION}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
-	docker buildx build --platform $(ARCHS) --push -t $(REPO):${SEMVER} --target main -f ${VERSION}/Dockerfile ${VERSION}/
-	docker buildx build --platform $(ARCHS) --push -t $(REPO):${SEMVER}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --platform $(ARCHS) --push $(OCI_LABELS) -t $(REPO):${VERSION} --target main -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --platform $(ARCHS) --push $(OCI_LABELS) -t $(REPO):${VERSION}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --platform $(ARCHS) --push $(OCI_LABELS) -t $(REPO):${SEMVER} --target main -f ${VERSION}/Dockerfile ${VERSION}/
+	docker buildx build --platform $(ARCHS) --push $(OCI_LABELS) -t $(REPO):${SEMVER}-dev --target dev -f ${VERSION}/Dockerfile ${VERSION}/
 
 test-all:
 	VERSION=8.3 $(MAKE) build
