@@ -17,6 +17,7 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.20/main
     php83-ctype \
     php83-curl \
     php83-exif \
+    php83-fileinfo \
     php83-iconv \
     php83-intl \
     php83-mbstring \
@@ -33,6 +34,10 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.20/main
     php83-fpm \
     php83-sodium \
     php83-tokenizer \
+    php83-pdo \
+    php83-pdo_mysql \
+    php83-pdo_pgsql \
+    php83-simplexml \
     php83-pecl-apcu \
     && ln -sf /usr/bin/php83 /usr/bin/php
 

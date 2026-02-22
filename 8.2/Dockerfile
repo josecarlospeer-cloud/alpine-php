@@ -19,6 +19,7 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/main
     php82-ctype \
     php82-curl \
     php82-exif \
+    php82-fileinfo \
     php82-iconv \
     php82-intl \
     php82-mbstring \
@@ -35,6 +36,10 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.21/main
     php82-fpm \
     php82-sodium \
     php82-tokenizer \
+    php82-pdo \
+    php82-pdo_mysql \
+    php82-pdo_pgsql \
+    php82-simplexml \
     # Iconv Fix
     php82-pecl-apcu \
     && ln -sf /usr/bin/php82 /usr/bin/php

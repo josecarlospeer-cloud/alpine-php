@@ -17,6 +17,7 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.19/main
     php81-ctype \
     php81-curl \
     php81-exif \
+    php81-fileinfo \
     php81-iconv \
     php81-intl \
     php81-mbstring \
@@ -33,6 +34,10 @@ RUN apk --no-cache --repository https://dl-cdn.alpinelinux.org/alpine/v3.19/main
     php81-fpm \
     php81-sodium \
     php81-tokenizer \
+    php81-pdo \
+    php81-pdo_mysql \
+    php81-pdo_pgsql \
+    php81-simplexml \
     php81-pecl-apcu \
     && ln -sf /usr/bin/php81 /usr/bin/php
 
